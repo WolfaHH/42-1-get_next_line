@@ -10,28 +10,27 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include"get_next_line.h"
 
 char	*get_next_line(int fd)
 {
-	char	ligne[12000000];
-	char	buffer;
-	int		i;
-	int		j;
+	static char	box[BUFFER_SIZE + 1];
+	char		*line;
+	int			i;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	j = read(fd, &buffer, 1);
 	i = 0;
-	while (j > 0)
+	if (read(fd, NULL, 0) < 0)
 	{
-		ligne[i++] = buffer;
-		if (buffer == '\n')
-			break ;
-		j = read(fd, &buffer, 1);
-	}
-	ligne[i] = '\0';
-	if (i == 0 && j <= 0)
+		while (box[i])
+			box[i++] = 0;
 		return (NULL);
-	return (ft_strdup(ligne));
+	}
+	line = NULL;
+	while (box[0] || read(fd, box, BUFFER_SIZE))
+	{
+		line = get_strjoin(line, box);
+		if (check_newline(box))
+			break ;
+	}
+	return (line);
 }
